@@ -1,6 +1,9 @@
 use std::io::{self, Write};
 use std::{env, process::exit};
 
+mod scanner;
+mod token_type;
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 2 {
@@ -30,7 +33,10 @@ fn run_prompt() {
         if line.is_empty() {
             break;
         }
-
-        println!("You entered: {}", line);
+        run(line.to_string());
     }
+}
+
+fn run(source: String) {
+    println!("You entered: {}", source);
 }
