@@ -4,6 +4,7 @@ use std::{env, process::exit};
 use scanner::Scanner;
 
 mod scanner;
+mod token;
 mod token_type;
 
 fn main() {
@@ -41,6 +42,9 @@ fn run_prompt() {
 
 fn run(source: String) {
     let mut scanner = Scanner::new(&source);
-    scanner.scan_tokens();
+    let tokens = scanner.scan_tokens();
+    for token in tokens {
+        println!("{:?}", token.lexeme);
+    }
     println!("You entered: {}", source);
 }
