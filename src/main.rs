@@ -45,6 +45,7 @@ fn run(source: String) {
     let tokens = scanner.scan_tokens();
     for token in tokens {
         println!("{:?}", token.lexeme);
+        println!("{:?}", token.token_type);
     }
     println!("You entered: {}", source);
 }
