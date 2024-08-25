@@ -1,6 +1,8 @@
 use std::io::{self, Write};
 use std::{env, process::exit};
 
+use scanner::Scanner;
+
 mod scanner;
 mod token_type;
 
@@ -38,5 +40,7 @@ fn run_prompt() {
 }
 
 fn run(source: String) {
+    let mut scanner = Scanner::new(&source);
+    scanner.scan_tokens();
     println!("You entered: {}", source);
 }
