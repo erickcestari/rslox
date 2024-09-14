@@ -5,7 +5,7 @@ use scanner::Scanner;
 
 mod scanner;
 mod token;
-mod token_type;
+mod token_kind;
 
 fn main() {
     let args: Vec<String> = env::args().collect();

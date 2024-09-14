@@ -1,5 +1,5 @@
 #[derive(Clone, Debug)]
-pub enum TokenType {
+pub enum TokenKind {
     // Single-character tokens.
     LeftParen,
     RightParen,

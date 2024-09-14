@@ -1,6 +1,6 @@
 use crate::{
     token::{CloneAny, Token},
-    token_type::TokenType,
+    token_kind::TokenKind,
 };
 
 pub struct Scanner {
@@ -31,7 +31,7 @@ impl Scanner {
         self.tokens.push(Token {
             lexeme: "".to_string(),
             line: self.line,
-            token_type: TokenType::Eof,
+            token_type: TokenKind::Eof,
             literal: None,
         });
         self.tokens.clone()
@@ -40,45 +40,45 @@ impl Scanner {
     pub fn scan_token(&mut self) {
         let c = self.advance();
         match c {
-            '(' => self.add_token_no_literal(TokenType::LeftParen),
-            ')' => self.add_token_no_literal(TokenType::RightParen),
-            '{' => self.add_token_no_literal(TokenType::LeftBrace),
-            '}' => self.add_token_no_literal(TokenType::RightBrace),
-            ',' => self.add_token_no_literal(TokenType::Comma),
-            '.' => self.add_token_no_literal(TokenType::Dot),
-            '-' => self.add_token_no_literal(TokenType::Minus),
-            '+' => self.add_token_no_literal(TokenType::Plus),
-            ';' => self.add_token_no_literal(TokenType::Semicolon),
-            '*' => self.add_token_no_literal(TokenType::Star),
+            '(' => self.add_token_no_literal(TokenKind::LeftParen),
+            ')' => self.add_token_no_literal(TokenKind::RightParen),
+            '{' => self.add_token_no_literal(TokenKind::LeftBrace),
+            '}' => self.add_token_no_literal(TokenKind::RightBrace),
+            ',' => self.add_token_no_literal(TokenKind::Comma),
+            '.' => self.add_token_no_literal(TokenKind::Dot),
+            '-' => self.add_token_no_literal(TokenKind::Minus),
+            '+' => self.add_token_no_literal(TokenKind::Plus),
+            ';' => self.add_token_no_literal(TokenKind::Semicolon),
+            '*' => self.add_token_no_literal(TokenKind::Star),
             '!' => {
                 let token_type = if self.match_char('=') {
-                    TokenType::BangEqual
+                    TokenKind::BangEqual
                 } else {
-                    TokenType::Bang
+                    TokenKind::Bang
                 };
                 self.add_token_no_literal(token_type);
             }
             '=' => {
                 let token_type = if self.match_char('=') {
-                    TokenType::EqualEqual
+                    TokenKind::EqualEqual
                 } else {
-                    TokenType::Equal
+                    TokenKind::Equal
                 };
                 self.add_token_no_literal(token_type);
             }
             '<' => {
                 let token_type = if self.match_char('=') {
-                    TokenType::LessEqual
+                    TokenKind::LessEqual
                 } else {
-                    TokenType::Less
+                    TokenKind::Less
                 };
                 self.add_token_no_literal(token_type);
             }
             '>' => {
                 let token_type = if self.match_char('=') {
-                    TokenType::GreaterEqual
+                    TokenKind::GreaterEqual
                 } else {
-                    TokenType::Greater
+                    TokenKind::Greater
                 };
                 self.add_token_no_literal(token_type);
             }
@@ -88,7 +88,7 @@ impl Scanner {
                         self.advance();
                     }
                 } else {
-                    self.add_token_no_literal(TokenType::Slash);
+                    self.add_token_no_literal(TokenKind::Slash);
                 }
             }
             ' ' | '\r' | '\t' => {}
@@ -128,7 +128,7 @@ impl Scanner {
         self.current >= self.source.len()
     }
 
-    fn add_token_no_literal(&mut self, token_type: TokenType) {
+    fn add_token_no_literal(&mut self, token_type: TokenKind) {
         self.add_token(token_type, None)
     }
 
@@ -148,7 +148,7 @@ impl Scanner {
         self.advance();
 
         let value = self.source[self.start + 1..self.current - 1].to_string();
-        self.add_token(TokenType::String, Some(Box::new(value)));
+        self.add_token(TokenKind::String, Some(Box::new(value)));
     }
 
     fn number(&mut self) {
@@ -166,7 +166,7 @@ impl Scanner {
         let value = self.source[self.start..self.current]
             .parse::<f64>()
             .unwrap();
-        self.add_token(TokenType::Number, Some(Box::new(value)));
+        self.add_token(TokenKind::Number, Some(Box::new(value)));
     }
 
     fn identifier(&mut self) {
@@ -176,29 +176,29 @@ impl Scanner {
 
         let text = &self.source[self.start..self.current];
         let token_type = match text {
-            "and" => TokenType::And,
-            "class" => TokenType::Class,
-            "else" => TokenType::Else,
-            "false" => TokenType::False,
-            "for" => TokenType::For,
-            "fun" => TokenType::Fun,
-            "if" => TokenType::If,
-            "nil" => TokenType::Nil,
-            "or" => TokenType::Or,
-            "print" => TokenType::Print,
-            "return" => TokenType::Return,
-            "super" => TokenType::Super,
-            "this" => TokenType::This,
-            "true" => TokenType::True,
-            "var" => TokenType::Var,
-            "while" => TokenType::While,
-            _ => TokenType::Identifier,
+            "and" => TokenKind::And,
+            "class" => TokenKind::Class,
+            "else" => TokenKind::Else,
+            "false" => TokenKind::False,
+            "for" => TokenKind::For,
+            "fun" => TokenKind::Fun,
+            "if" => TokenKind::If,
+            "nil" => TokenKind::Nil,
+            "or" => TokenKind::Or,
+            "print" => TokenKind::Print,
+            "return" => TokenKind::Return,
+            "super" => TokenKind::Super,
+            "this" => TokenKind::This,
+            "true" => TokenKind::True,
+            "var" => TokenKind::Var,
+            "while" => TokenKind::While,
+            _ => TokenKind::Identifier,
         };
 
         self.add_token(token_type, None);
     }
 
-    fn add_token(&mut self, token_type: TokenType, literal: Option<Box<dyn CloneAny>>) {
+    fn add_token(&mut self, token_type: TokenKind, literal: Option<Box<dyn CloneAny>>) {
         let token = self.source[self.start..self.current].to_string();
         self.tokens.push(Token {
             lexeme: token,
