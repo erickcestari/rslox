@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use std::os::linux::raw::stat;
 use std::{env, process::exit};
 
 use scanner::Scanner;
@@ -7,6 +8,9 @@ mod scanner;
 mod token;
 mod token_kind;
 mod literal;
+mod parser;
+mod statment;
+mod expression;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -44,9 +48,15 @@ fn run_prompt() {
 fn run(source: String) {
     let mut scanner = Scanner::new(&source);
     let tokens = scanner.scan_tokens();
-    for token in tokens {
-        println!("{:?}", token.lexeme);
-        println!("{:?}", token.token_type);
+    let statments = parser::Parser::new(tokens).parse();
+    match statments {
+        Ok(statments) => {
+            for statment in statments {
+                println!("{:?}", statment);
+            }
+        }
+        Err(_) => {}
     }
+    
     println!("You entered: {}", source);
 }

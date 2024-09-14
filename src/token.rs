@@ -1,8 +1,8 @@
 use crate::{literal::Literal, token_kind::TokenKind};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Token {
-    pub token_type: TokenKind,
+    pub kind: TokenKind,
     pub lexeme: String,
     pub line: usize,
     pub literal: Option<Literal>,

@@ -1,6 +1,3 @@
-use std::borrow::Cow;
-use std::fmt::Display;
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
     Number(f64),

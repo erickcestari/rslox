@@ -30,7 +30,7 @@ impl Scanner {
         self.tokens.push(Token {
             lexeme: "".to_string(),
             line: self.line,
-            token_type: TokenKind::Eof,
+            kind: TokenKind::Eof,
             literal: None,
         });
         self.tokens.clone()
@@ -50,36 +50,36 @@ impl Scanner {
             ';' => self.add_token_no_literal(TokenKind::Semicolon),
             '*' => self.add_token_no_literal(TokenKind::Star),
             '!' => {
-                let token_type = if self.match_char('=') {
+                let kind = if self.match_char('=') {
                     TokenKind::BangEqual
                 } else {
                     TokenKind::Bang
                 };
-                self.add_token_no_literal(token_type);
+                self.add_token_no_literal(kind);
             }
             '=' => {
-                let token_type = if self.match_char('=') {
+                let kind = if self.match_char('=') {
                     TokenKind::EqualEqual
                 } else {
                     TokenKind::Equal
                 };
-                self.add_token_no_literal(token_type);
+                self.add_token_no_literal(kind);
             }
             '<' => {
-                let token_type = if self.match_char('=') {
+                let kind = if self.match_char('=') {
                     TokenKind::LessEqual
                 } else {
                     TokenKind::Less
                 };
-                self.add_token_no_literal(token_type);
+                self.add_token_no_literal(kind);
             }
             '>' => {
-                let token_type = if self.match_char('=') {
+                let kind = if self.match_char('=') {
                     TokenKind::GreaterEqual
                 } else {
                     TokenKind::Greater
                 };
-                self.add_token_no_literal(token_type);
+                self.add_token_no_literal(kind);
             }
             '/' => {
                 if self.match_char('/') {
@@ -127,8 +127,8 @@ impl Scanner {
         self.current >= self.source.len()
     }
 
-    fn add_token_no_literal(&mut self, token_type: TokenKind) {
-        self.add_token(token_type, None)
+    fn add_token_no_literal(&mut self, kind: TokenKind) {
+        self.add_token(kind, None)
     }
 
     fn string(&mut self) {
@@ -174,7 +174,7 @@ impl Scanner {
         }
 
         let text = &self.source[self.start..self.current];
-        let token_type = match text {
+        let kind = match text {
             "and" => TokenKind::And,
             "class" => TokenKind::Class,
             "else" => TokenKind::Else,
@@ -194,15 +194,15 @@ impl Scanner {
             _ => TokenKind::Identifier,
         };
 
-        self.add_token(token_type, None);
+        self.add_token(kind, None);
     }
 
-    fn add_token(&mut self, token_type: TokenKind, literal: Option<Literal>) {
+    fn add_token(&mut self, kind: TokenKind, literal: Option<Literal>) {
         let token = self.source[self.start..self.current].to_string();
         self.tokens.push(Token {
             lexeme: token,
             line: self.line,
-            token_type,
+            kind,
             literal,
         })
     }
