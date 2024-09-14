@@ -1,6 +1,5 @@
 use crate::{
-    token::{CloneAny, Token},
-    token_kind::TokenKind,
+    literal::Literal, token::Token, token_kind::TokenKind
 };
 
 pub struct Scanner {
@@ -148,7 +147,7 @@ impl Scanner {
         self.advance();
 
         let value = self.source[self.start + 1..self.current - 1].to_string();
-        self.add_token(TokenKind::String, Some(Box::new(value)));
+        self.add_token(TokenKind::String, Some(Literal::String(value)));
     }
 
     fn number(&mut self) {
@@ -166,7 +165,7 @@ impl Scanner {
         let value = self.source[self.start..self.current]
             .parse::<f64>()
             .unwrap();
-        self.add_token(TokenKind::Number, Some(Box::new(value)));
+        self.add_token(TokenKind::Number, Some(Literal::Number(value)));
     }
 
     fn identifier(&mut self) {
@@ -198,7 +197,7 @@ impl Scanner {
         self.add_token(token_type, None);
     }
 
-    fn add_token(&mut self, token_type: TokenKind, literal: Option<Box<dyn CloneAny>>) {
+    fn add_token(&mut self, token_type: TokenKind, literal: Option<Literal>) {
         let token = self.source[self.start..self.current].to_string();
         self.tokens.push(Token {
             lexeme: token,

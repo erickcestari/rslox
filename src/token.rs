@@ -1,17 +1,9 @@
-use std::any::Any;
-
-use dyn_clone::DynClone;
-
-use crate::token_kind::TokenKind;
-pub trait CloneAny: Any + DynClone {}
-dyn_clone::clone_trait_object!(CloneAny);
-
-impl<T> CloneAny for T where T: Any + Clone {}
+use crate::{literal::Literal, token_kind::TokenKind};
 
 #[derive(Clone)]
 pub struct Token {
     pub token_type: TokenKind,
     pub lexeme: String,
     pub line: usize,
-    pub literal: Option<Box<dyn CloneAny>>,
+    pub literal: Option<Literal>,
 }
