@@ -1,16 +1,16 @@
+use std::fs;
 use std::io::{self, Write};
-use std::os::linux::raw::stat;
 use std::{env, process::exit};
 
 use scanner::Scanner;
 
-mod scanner;
-mod token;
-mod token_kind;
+mod expression;
 mod literal;
 mod parser;
-mod statment;
-mod expression;
+mod scanner;
+mod statement;
+mod token;
+mod token_kind;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -22,9 +22,15 @@ fn main() {
         run_prompt();
         return;
     }
-    let file_path = &args[1];
 
-    println!("In file {file_path}");
+    let file_path = &args[1];
+    match fs::read_to_string(file_path) {
+        Ok(source) => run(source),
+        Err(err) => {
+            eprintln!("Error reading file {}: {}", file_path, err);
+            exit(1);
+        }
+    }
 }
 
 fn run_prompt() {
@@ -49,14 +55,9 @@ fn run(source: String) {
     let mut scanner = Scanner::new(&source);
     let tokens = scanner.scan_tokens();
     let statments = parser::Parser::new(tokens).parse();
-    match statments {
-        Ok(statments) => {
-            for statment in statments {
-                println!("{:?}", statment);
-            }
-        }
-        Err(_) => {}
+    for statment in statments {
+        println!("{:?}", statment);
     }
-    
+
     println!("You entered: {}", source);
 }

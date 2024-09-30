@@ -1,6 +1,4 @@
-use crate::{
-    literal::Literal, token::Token, token_kind::TokenKind
-};
+use crate::{literal::Literal, token::Token, token_kind::TokenKind};
 
 pub struct Scanner {
     pub start: usize,
@@ -123,6 +121,13 @@ impl Scanner {
         self.source.chars().nth(self.current).unwrap()
     }
 
+    fn peek_next(&self) -> char {
+        if self.current + 1 >= self.source.len() {
+            return '\0';
+        }
+        self.source.chars().nth(self.current + 1).unwrap()
+    }
+
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
@@ -155,7 +160,7 @@ impl Scanner {
             self.advance();
         }
 
-        if self.peek() == '.' && self.peek().is_digit(10) {
+        if self.peek() == '.' && self.peek_next().is_digit(10) {
             self.advance();
             while self.peek().is_digit(10) {
                 self.advance();
