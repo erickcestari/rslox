@@ -84,7 +84,16 @@ impl Scanner {
                     while self.peek() != '\n' && !self.is_at_end() {
                         self.advance();
                     }
-                } else {
+                } else if self.match_char('*') {
+                    while self.peek() != '*' && self.peek_next() != '/' && !self.is_at_end() {
+                        if self.peek() == '\n' {
+                            self.line += 1;
+                        }
+                        self.advance();
+                    }
+                    self.advance();
+                    self.advance();
+                }else {
                     self.add_token_no_literal(TokenKind::Slash);
                 }
             }
