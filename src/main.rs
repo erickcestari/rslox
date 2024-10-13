@@ -11,6 +11,8 @@ mod scanner;
 mod statement;
 mod token;
 mod token_kind;
+mod interpreter;
+mod enviroment;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
