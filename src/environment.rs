@@ -57,7 +57,7 @@ impl Environment {
       return self.enclosing.as_ref().unwrap().get(name)
     }
 
-    Err(RuntimeError::new(format!("Undefined variable '{}'.", name.lexeme)))
+    Err(RuntimeError::new(format!("Undefined variable '{}'.", name.lexeme), Some(name)))
   }
 
   pub fn assign(&mut self, name: Token, value: Literal) -> Result<(), RuntimeError> {
@@ -70,6 +70,6 @@ impl Environment {
       return self.enclosing.as_mut().unwrap().assign(name, value)
     }
 
-    Err(RuntimeError::new(format!("Undefined variable '{}'.", name.lexeme)))
+    Err(RuntimeError::new(format!("Undefined variable '{}'.", name.lexeme), Some(name)))
   }
 }

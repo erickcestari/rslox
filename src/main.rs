@@ -2,6 +2,8 @@ use std::fs;
 use std::io::{self, Write};
 use std::{env, process::exit};
 
+use interpreter::Interpreter;
+use parser::Parser;
 use scanner::Scanner;
 
 mod expression;
@@ -12,7 +14,7 @@ mod statement;
 mod token;
 mod token_kind;
 mod interpreter;
-mod enviroment;
+mod environment;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -54,11 +56,11 @@ fn run_prompt() {
 }
 
 fn run(source: String) {
-    let mut scanner = Scanner::new(&source);
-    let tokens = scanner.scan_tokens();
-    let statments = parser::Parser::new(tokens).parse();
-    for statment in statments {
-        println!("{:?}", statment);
+    let tokens = Scanner::new(&source).scan_tokens();
+    let statments = Parser::new(tokens).parse();
+    if let Err(err) = Interpreter::new().interpret(statments) {
+        err.print();
+        exit(70)
     }
 
     println!("You entered: {}", source);
