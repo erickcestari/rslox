@@ -1,6 +1,6 @@
-use std::{collections::HashMap, fmt::Error};
+use std::collections::HashMap;
 
-use crate::{literal::Literal, token::Token};
+use crate::{interpreter::RuntimeError, literal::Literal, token::Token};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Environment {
@@ -48,13 +48,28 @@ impl Environment {
     };
   }
 
-  // pub fn get(&self, name: Token) -> Result<Option<Literal>, Error> {
-  //   if self.values.contains_key(&name.lexeme) {
-  //     return Ok(self.values.get(&name.lexeme))
-  //   }
+  pub fn get(&self, name: Token) -> Result<Option<Literal>, RuntimeError> {
+    if self.values.contains_key(&name.lexeme) {
+      return Ok(self.values.get(&name.lexeme).cloned())
+    }
 
-  //   if(self.enclosing.is_none()) {
-  //     return self.enclosing.
-  //   }
-  // }
+    if !self.enclosing.is_none() {
+      return self.enclosing.as_ref().unwrap().get(name)
+    }
+
+    Err(RuntimeError::new(format!("Undefined variable '{}'.", name.lexeme)))
+  }
+
+  pub fn assign(&mut self, name: Token, value: Literal) -> Result<(), RuntimeError> {
+    if self.values.contains_key(&name.lexeme) {
+      self.values.insert(name.lexeme.clone(), value);
+      return Ok(());
+    }
+
+    if !self.enclosing.is_none() {
+      return self.enclosing.as_mut().unwrap().assign(name, value)
+    }
+
+    Err(RuntimeError::new(format!("Undefined variable '{}'.", name.lexeme)))
+  }
 }
