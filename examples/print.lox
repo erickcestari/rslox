@@ -1,7 +1,7 @@
-// My first Lox program!
+// Your first Lox program!
 print "Hello, world!";
 
-print "This is my " + " first program" + (10 + (10 * 10));
+print "This is my " + (10 + 10.10 * 10) + " first program";
 
 /*
 This is a comment
