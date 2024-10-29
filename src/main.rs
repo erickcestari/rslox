@@ -6,15 +6,15 @@ use interpreter::Interpreter;
 use parser::Parser;
 use scanner::Scanner;
 
+mod environment;
 mod expression;
+mod interpreter;
 mod literal;
 mod parser;
 mod scanner;
 mod statement;
 mod token;
 mod token_kind;
-mod interpreter;
-mod environment;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -62,6 +62,4 @@ fn run(source: String) {
         err.print();
         exit(70)
     }
-
-    println!("You entered: {}", source);
 }

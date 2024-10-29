@@ -62,21 +62,20 @@ impl Parser {
     }
 
     fn statement(&mut self) -> Result<Stmt, ParseError> {
-        match self.match_token(&[
-            TokenKind::For,
-            TokenKind::If,
-            TokenKind::Print,
-            TokenKind::Return,
-            TokenKind::While,
-            TokenKind::LeftBrace,
-        ]) {
-            true if self.match_token(&[TokenKind::For]) => self.for_statement(),
-            true if self.match_token(&[TokenKind::If]) => self.if_statement(),
-            true if self.match_token(&[TokenKind::Print]) => self.print_statement(),
-            true if self.match_token(&[TokenKind::Return]) => self.return_statement(),
-            true if self.match_token(&[TokenKind::While]) => self.while_statement(),
-            true if self.match_token(&[TokenKind::LeftBrace]) => Ok(Stmt::Block(self.block()?)),
-            _ => self.expression_statement(),
+        if self.match_token(&[TokenKind::For]) {
+            self.for_statement()
+        } else if self.match_token(&[TokenKind::If]) {
+            self.if_statement()
+        } else if self.match_token(&[TokenKind::Print]) {
+            self.print_statement()
+        } else if self.match_token(&[TokenKind::Return]) {
+            self.return_statement()
+        } else if self.match_token(&[TokenKind::While]) {
+            self.while_statement()
+        } else if self.match_token(&[TokenKind::LeftBrace]) {
+            Ok(Stmt::Block(self.block()?))
+        } else {
+            self.expression_statement()
         }
     }
 

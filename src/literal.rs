@@ -1,3 +1,5 @@
+use core::fmt;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
     Number(f64),
@@ -14,5 +16,11 @@ impl Literal {
             Literal::Boolean(b) => b.to_string(),
             Literal::Nil => "nil".into(),
         }
+    }
+}
+
+impl fmt::Display for Literal {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.to_string())
     }
 }
