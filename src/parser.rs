@@ -310,7 +310,7 @@ impl Parser {
 
         while self.match_token(&[TokenKind::Minus, TokenKind::Plus]) {
             let operator = self.previous().clone();
-            let right = self.unary()?;
+            let right = self.factor()?;
             expr = Expr::Binary(Box::new(expr), operator, Box::new(right));
         }
 
@@ -382,12 +382,11 @@ impl Parser {
         if self.match_token(&[TokenKind::Nil]) {
             return Ok(Expr::Literal(Literal::Nil));
         }
-
         if self.match_token(&[TokenKind::Number, TokenKind::String]) {
             return Ok(Expr::Literal(self.previous().literal.clone().unwrap()));
         }
 
-        if self.match_token(&[TokenKind::Number, TokenKind::String]) {
+        if self.match_token(&[TokenKind::Identifier]) {
             return Ok(Expr::Variable(self.previous().clone()));
         }
 
