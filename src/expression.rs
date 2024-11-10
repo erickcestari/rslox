@@ -171,8 +171,29 @@ impl Evaluate for Expr {
                 _ => panic!("Invalid binary operator"),
             },
             Expr::Logical(left, token, right) => {
-                // Implement logical operation evaluation logic here
-                unimplemented!("Logical operation evaluation is not implemented yet")
+                let left_evaluated = left.evaluate(environment)?;
+                match token.kind {
+                    TokenKind::Or => {
+                        if left_evaluated.is_truthy() {
+                            Ok(Literal::Boolean(true))
+                        } else {
+                            let right_evaluated = right.evaluate(environment)?;
+                            Ok(right_evaluated)
+                        }
+                    }
+                    TokenKind::And => {
+                        if !left_evaluated.is_truthy() {
+                            Ok(Literal::Boolean(false))
+                        } else {
+                            let right_evaluated = right.evaluate(environment)?;
+                            Ok(right_evaluated)
+                        }
+                    }
+                    _ => Err(RuntimeError::new(
+                        "Logical evaluator needs to be AND or OR".to_string(),
+                        Some(token.clone()),
+                    )),
+                }
             }
             Expr::Unary(token, expr) => {
                 // Implement unary operation evaluation logic here

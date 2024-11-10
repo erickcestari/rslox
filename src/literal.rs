@@ -17,6 +17,14 @@ impl Literal {
             Literal::Nil => "nil".into(),
         }
     }
+
+    pub fn is_truthy(&self) -> bool {
+        match self {
+            Literal::Boolean(b) => *b,
+            Literal::Nil => false,
+            _ => true,
+        }
+    }
 }
 
 impl fmt::Display for Literal {
