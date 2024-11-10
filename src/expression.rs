@@ -1,4 +1,7 @@
-use crate::{interpreter::RuntimeError, literal::Literal, token::Token, token_kind::TokenKind};
+use crate::{
+    environment::Environment, interpreter::RuntimeError, literal::Literal, token::Token,
+    token_kind::TokenKind,
+};
 
 #[derive(Debug, Clone)]
 pub enum Expr {
@@ -13,25 +16,22 @@ pub enum Expr {
 }
 
 pub trait Evaluate {
-    fn evaluate(&self) -> Result<Literal, RuntimeError>;
+    fn evaluate(&self, environment: &mut Environment) -> Result<Literal, RuntimeError>;
 }
-
 impl Evaluate for Expr {
-    fn evaluate(&self) -> Result<Literal, RuntimeError> {
+    fn evaluate(&self, environment: &mut Environment) -> Result<Literal, RuntimeError> {
         match self {
             Expr::Literal(literal) => Ok(literal.clone()),
-            Expr::Variable(token) => {
-                // Implement variable evaluation logic here
-                unimplemented!("Variable evaluation is not implemented yet")
-            }
+            Expr::Variable(token) => environment.get(token.clone()),
             Expr::Assign(token, expr) => {
-                // Implement assignment evaluation logic here
-                unimplemented!("Assignment evaluation is not implemented yet")
+                let value = expr.evaluate(environment)?;
+                environment.assign(token.clone(), value.clone())?;
+                Ok(value)
             }
             Expr::Binary(left, token, right) => match token.kind {
                 TokenKind::Plus => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     match (left, right) {
                         (Literal::Number(left), Literal::Number(right)) => {
                             return Ok(Literal::Number(left + right))
@@ -54,8 +54,8 @@ impl Evaluate for Expr {
                     }
                 }
                 TokenKind::Minus => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     match (left, right) {
                         (Literal::Number(left), Literal::Number(right)) => {
                             return Ok(Literal::Number(left - right))
@@ -69,8 +69,8 @@ impl Evaluate for Expr {
                     }
                 }
                 TokenKind::Slash => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     match (left, right) {
                         (Literal::Number(left), Literal::Number(right)) => {
                             return Ok(Literal::Number(left / right))
@@ -84,8 +84,8 @@ impl Evaluate for Expr {
                     }
                 }
                 TokenKind::Star => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     match (left, right) {
                         (Literal::Number(left), Literal::Number(right)) => {
                             return Ok(Literal::Number(left * right))
@@ -99,8 +99,8 @@ impl Evaluate for Expr {
                     }
                 }
                 TokenKind::Greater => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     match (left, right) {
                         (Literal::Number(left), Literal::Number(right)) => {
                             return Ok(Literal::Boolean(left > right))
@@ -114,8 +114,8 @@ impl Evaluate for Expr {
                     }
                 }
                 TokenKind::GreaterEqual => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     match (left, right) {
                         (Literal::Number(left), Literal::Number(right)) => {
                             return Ok(Literal::Boolean(left >= right))
@@ -129,8 +129,8 @@ impl Evaluate for Expr {
                     }
                 }
                 TokenKind::Less => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     match (left, right) {
                         (Literal::Number(left), Literal::Number(right)) => {
                             return Ok(Literal::Boolean(left < right))
@@ -144,8 +144,8 @@ impl Evaluate for Expr {
                     }
                 }
                 TokenKind::LessEqual => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     match (left, right) {
                         (Literal::Number(left), Literal::Number(right)) => {
                             return Ok(Literal::Boolean(left <= right))
@@ -159,13 +159,13 @@ impl Evaluate for Expr {
                     }
                 }
                 TokenKind::EqualEqual => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     return Ok(Literal::Boolean(left == right));
                 }
                 TokenKind::BangEqual => {
-                    let left = left.evaluate()?;
-                    let right = right.evaluate()?;
+                    let left = left.evaluate(environment)?;
+                    let right = right.evaluate(environment)?;
                     return Ok(Literal::Boolean(left != right));
                 }
                 _ => panic!("Invalid binary operator"),
@@ -178,7 +178,7 @@ impl Evaluate for Expr {
                 // Implement unary operation evaluation logic here
                 unimplemented!("Unary operation evaluation is not implemented yet")
             }
-            Expr::Grouping(expr) => expr.evaluate(),
+            Expr::Grouping(expr) => expr.evaluate(environment),
             Expr::Call(callee, token, arguments) => {
                 // Implement function call evaluation logic here
                 unimplemented!("Function call evaluation is not implemented yet")

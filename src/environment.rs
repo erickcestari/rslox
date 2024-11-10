@@ -21,55 +21,61 @@ impl Environment {
     }
 
     pub fn ancestor(&self, distance: usize) -> Option<Box<Environment>> {
-      if distance == 0 {
-          return Some(Box::new(self.clone()));
-      }
-      let mut environment = self;
-      for _ in 0..distance {
-          match &environment.enclosing {
-              Some(enclosing) => environment = enclosing,
-              None => return None,
-          }
-      }
-      Some(Box::new(environment.clone()))
-  }
-
-  pub fn get_at(self, distance: usize, name: String) -> Option<Literal> {
-    match self.ancestor(distance){
-        Some(env) => env.values.get(&name).cloned(),
-        None =>  None,
-    }
-  }
-
-  pub fn assign_at(&mut self, distance: usize, name: Token, value: Literal) {
-    match self.ancestor(distance){
-      Some(mut env) => env.values.insert(name.lexeme, value),
-      None =>  None,
-    };
-  }
-
-  pub fn get(&self, name: Token) -> Result<Option<Literal>, RuntimeError> {
-    if self.values.contains_key(&name.lexeme) {
-      return Ok(self.values.get(&name.lexeme).cloned())
+        if distance == 0 {
+            return Some(Box::new(self.clone()));
+        }
+        let mut environment = self;
+        for _ in 0..distance {
+            match &environment.enclosing {
+                Some(enclosing) => environment = enclosing,
+                None => return None,
+            }
+        }
+        Some(Box::new(environment.clone()))
     }
 
-    if !self.enclosing.is_none() {
-      return self.enclosing.as_ref().unwrap().get(name)
+    pub fn get_at(self, distance: usize, name: String) -> Option<Literal> {
+        match self.ancestor(distance) {
+            Some(env) => env.values.get(&name).cloned(),
+            None => None,
+        }
     }
 
-    Err(RuntimeError::new(format!("Undefined variable '{}'.", name.lexeme), Some(name)))
-  }
-
-  pub fn assign(&mut self, name: Token, value: Literal) -> Result<(), RuntimeError> {
-    if self.values.contains_key(&name.lexeme) {
-      self.values.insert(name.lexeme.clone(), value);
-      return Ok(());
+    pub fn assign_at(&mut self, distance: usize, name: Token, value: Literal) {
+        match self.ancestor(distance) {
+            Some(mut env) => env.values.insert(name.lexeme, value),
+            None => None,
+        };
     }
 
-    if !self.enclosing.is_none() {
-      return self.enclosing.as_mut().unwrap().assign(name, value)
+    pub fn get(&self, name: Token) -> Result<Literal, RuntimeError> {
+        if let Some(value) = self.values.get(&name.lexeme) {
+            return Ok(value.clone());
+        }
+
+        if let Some(enclosing) = &self.enclosing {
+            return enclosing.get(name);
+        }
+
+        Err(RuntimeError::new(
+            format!("Undefined variable '{}'.", name.lexeme),
+            Some(name),
+        ))
     }
 
-    Err(RuntimeError::new(format!("Undefined variable '{}'.", name.lexeme), Some(name)))
-  }
+    pub fn assign(&mut self, name: Token, value: Literal) -> Result<(), RuntimeError> {
+        if self.values.contains_key(&name.lexeme) {
+            self.values.insert(name.lexeme.clone(), value);
+            return Ok(());
+        }
+
+        if !self.enclosing.is_none() {
+            return self.enclosing.as_mut().unwrap().assign(name, value);
+        }
+
+        Err(RuntimeError::new(
+            format!("Undefined variable '{}'.", name.lexeme),
+            Some(name),
+        ))
+    }
 }

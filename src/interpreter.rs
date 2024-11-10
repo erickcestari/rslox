@@ -50,7 +50,6 @@ impl Interpreter {
     pub fn interpret(&mut self, statements: Vec<Stmt>) -> Result<(), RuntimeError> {
         for statement in statements {
             if let Err(err) = self.execute(&statement) {
-                println!("{}", err.message);
                 return Err(err);
             }
         }
@@ -60,15 +59,22 @@ impl Interpreter {
     fn execute(&mut self, statement: &Stmt) -> Result<(), RuntimeError> {
         match statement {
             Stmt::Expression(expr) => {
-                expr.evaluate()?;
+                expr.evaluate(&mut self.environment)?;
             }
             Stmt::Print(expr) => {
-                let value = expr.evaluate()?;
+                let value = expr.evaluate(&mut self.environment)?;
                 println!("{}", value);
-            } // Stmt::Var(name, expr) => {
-            //     let value = self.evaluate(expr)?;
-            //     self.environment.define(name.lexeme.clone(), value);
-            // }
+            }
+            Stmt::Var(name, expr) => match expr {
+                Some(expr) => {
+                    let value = expr.evaluate(&mut self.environment)?;
+                    self.environment.define(name.lexeme.clone(), value);
+                }
+                None => {
+                    self.environment
+                        .define(name.lexeme.clone(), crate::literal::Literal::Nil);
+                }
+            },
             // Stmt::Block(statements) => {
             //     let environment = Environment::new(Some(Box::new(self.environment.clone())));
             //     self.execute_block(statements, environment)?;
