@@ -4,7 +4,7 @@ use crate::{interpreter::RuntimeError, literal::Literal, token::Token};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Environment {
-    enclosing: Option<Box<Environment>>,
+    pub enclosing: Option<Box<Environment>>,
     values: HashMap<String, Literal>,
 }
 

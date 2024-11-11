@@ -75,10 +75,11 @@ impl Interpreter {
                         .define(name.lexeme.clone(), crate::literal::Literal::Nil);
                 }
             },
-            // Stmt::Block(statements) => {
-            //     let environment = Environment::new(Some(Box::new(self.environment.clone())));
-            //     self.execute_block(statements, environment)?;
-            // }
+            Stmt::Block(statements) => {
+                self.environment = Environment::new(Some(Box::new(self.environment.clone())));
+                self.interpret(statements.to_vec())?;
+                self.environment = *self.environment.enclosing.clone().unwrap();
+            }
             // Stmt::If(condition, then_branch, else_branch) => {
             //     if self.evaluate(condition)?.is_truthy() {
             //         self.execute(then_branch)?;
