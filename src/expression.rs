@@ -171,22 +171,22 @@ impl Evaluate for Expr {
                 _ => panic!("Invalid binary operator"),
             },
             Expr::Logical(left, token, right) => {
-                let left_evaluated = left.evaluate(environment)?;
+                let left = left.evaluate(environment)?;
                 match token.kind {
                     TokenKind::Or => {
-                        if left_evaluated.is_truthy() {
+                        if left.is_truthy() {
                             Ok(Literal::Boolean(true))
                         } else {
-                            let right_evaluated = right.evaluate(environment)?;
-                            Ok(right_evaluated)
+                            let right = right.evaluate(environment)?;
+                            Ok(right)
                         }
                     }
                     TokenKind::And => {
-                        if !left_evaluated.is_truthy() {
+                        if !left.is_truthy() {
                             Ok(Literal::Boolean(false))
                         } else {
-                            let right_evaluated = right.evaluate(environment)?;
-                            Ok(right_evaluated)
+                            let right = right.evaluate(environment)?;
+                            Ok(right)
                         }
                     }
                     _ => Err(RuntimeError::new(
@@ -196,8 +196,24 @@ impl Evaluate for Expr {
                 }
             }
             Expr::Unary(token, expr) => {
-                // Implement unary operation evaluation logic here
-                unimplemented!("Unary operation evaluation is not implemented yet")
+                let literal = expr.evaluate(environment)?;
+                match token.kind {
+                    TokenKind::Bang => Ok(Literal::Boolean(!literal.is_truthy())),
+                    TokenKind::Minus => {
+                        if let Literal::Number(n) = literal {
+                            Ok(Literal::Number(-n))
+                        } else {
+                            Err(RuntimeError::new(
+                                "Operand must be a number.".to_string(),
+                                Some(token.clone()),
+                            ))
+                        }
+                    }
+                    _ => Err(RuntimeError::new(
+                        "Unary Unreachable".to_string(),
+                        Some(token.clone()),
+                    )),
+                }
             }
             Expr::Grouping(expr) => expr.evaluate(environment),
             Expr::Call(callee, token, arguments) => {

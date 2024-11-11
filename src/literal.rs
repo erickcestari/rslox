@@ -25,6 +25,13 @@ impl Literal {
             _ => true,
         }
     }
+
+    pub fn is_number(&self) -> bool {
+        match self {
+            Literal::Number(_) => true,
+            _ => false,
+        }
+    }
 }
 
 impl fmt::Display for Literal {
