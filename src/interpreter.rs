@@ -87,11 +87,11 @@ impl Interpreter {
                     self.execute(else_branch)?;
                 }
             }
-            // Stmt::While(condition, body) => {
-            //     while self.evaluate(condition)?.is_truthy() {
-            //         self.execute(body)?;
-            //     }
-            // }
+            Stmt::While(condition, body) => {
+                while condition.evaluate(&mut self.environment)?.is_truthy() {
+                    self.execute(body)?;
+                }
+            }
             // Stmt::Function(name, params, body) => {
             //     let function = crate::literal::Literal::Function(
             //         name.lexeme.clone(),
