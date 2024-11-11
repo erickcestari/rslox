@@ -80,13 +80,13 @@ impl Interpreter {
                 self.interpret(statements.to_vec())?;
                 self.environment = *self.environment.enclosing.clone().unwrap();
             }
-            // Stmt::If(condition, then_branch, else_branch) => {
-            //     if self.evaluate(condition)?.is_truthy() {
-            //         self.execute(then_branch)?;
-            //     } else if let Some(else_branch) = else_branch {
-            //         self.execute(else_branch)?;
-            //     }
-            // }
+            Stmt::If(condition, then_branch, else_branch) => {
+                if condition.evaluate(&mut self.environment)?.is_truthy() {
+                    self.execute(then_branch)?;
+                } else if let Some(else_branch) = else_branch {
+                    self.execute(else_branch)?;
+                }
+            }
             // Stmt::While(condition, body) => {
             //     while self.evaluate(condition)?.is_truthy() {
             //         self.execute(body)?;
